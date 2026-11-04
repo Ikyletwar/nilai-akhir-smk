@@ -225,14 +225,21 @@ toggleBobotBtn.addEventListener('click', () => {
   toggleBobotBtn.textContent = hidden ? '⚖️ Atur bobot' : '⚖️ Sembunyikan bobot';
 });
 
+const iconMoon = document.getElementById('iconMoon');
+const iconSun = document.getElementById('iconSun');
+function syncThemeIcon() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  iconMoon.style.display = dark ? 'none' : 'block';
+  iconSun.style.display = dark ? 'block' : 'none';
+}
 toggleThemeBtn.addEventListener('click', () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = next;
-  toggleThemeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+  syncThemeIcon();
   persist();
 });
 
 /* ---------- Init ---------- */
 restore();
-toggleThemeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙';
+syncThemeIcon();
 render();

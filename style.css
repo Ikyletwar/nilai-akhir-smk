@@ -56,7 +56,7 @@ body {
 .brand-icon { font-size: 1.6rem; }
 h1 { font-size: 1.05rem; margin: 0; line-height: 1.2; }
 .subtitle { margin: .1rem 0 0; color: var(--muted); font-size: .75rem; }
-.icon-btn { font-size: 1.3rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; width: 44px; height: 44px; cursor: pointer; }
+.icon-btn { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 12px; width: 44px; height: 44px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 
 main.container { padding-top: 1rem; display: grid; gap: .9rem; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem; }
@@ -65,11 +65,12 @@ h2 { font-size: 1rem; margin: 0; }
 
 /* ---------- Hero ringkasan ---------- */
 .hero { display: grid; grid-template-columns: 1fr; gap: .75rem; align-items: center; text-align: center; }
-@media (min-width: 560px) { .hero { grid-template-columns: auto 1fr auto; text-align: left; gap: 1.5rem; } }
-.hero-label { display: block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
-.hero-value { display: block; font-size: 3.25rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+@media (min-width: 560px) { .hero { grid-template-columns: minmax(150px, auto) 1fr auto; text-align: left; gap: 1.5rem; } }
+.hero-main { min-width: 0; }
+.hero-label { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.hero-value { display: block; font-size: 3rem; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
 .hero-side { display: flex; gap: .6rem; justify-content: center; }
-.hero-chip { flex: 1; background: var(--surface-2); border-radius: 12px; padding: .5rem .75rem; min-width: 84px; }
+.hero-chip { flex: 1 1 0; background: var(--surface-2); border-radius: 12px; padding: .5rem .85rem; min-width: 92px; max-width: 160px; text-align: center; }
 .hero-chip-label { display: block; font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .hero-chip-value { display: block; font-size: 1.25rem; font-weight: 800; }
 .hero-chip-value.ok { color: var(--ok); }
@@ -117,7 +118,7 @@ input.invalid { border-color: var(--danger); background: var(--bad-soft); }
     position: static; backdrop-filter: none; border-top: none; background: none;
     padding: 0; max-width: 1080px; margin: 0 auto 1rem; justify-content: flex-end;
   }
-  .action-bar .btn { flex: 0 0 auto; }
+  .action-bar .btn, #addRow { flex: 0 0 auto; }
 }
 
 /* ---------- Tabel (desktop) ---------- */
