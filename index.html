@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Kalkulator nilai akhir SMK: hitung nilai rata-rata berbobot per mata pelajaran, predikat huruf, KKM, dan export CSV. Tanpa dependency." />
+<title>Kalkulator Nilai Akhir SMK</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="app-header">
+  <div class="container header-inner">
+    <div>
+      <h1>Kalkulator Nilai Akhir SMK</h1>
+      <p class="subtitle">Hitung nilai akhir berbobot, predikat, dan status KKM per mata pelajaran.</p>
+    </div>
+    <button id="toggleTheme" class="btn btn-ghost" type="button" aria-label="Ganti mode gelap/terang">🌙</button>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card settings" aria-labelledby="settings-title">
+    <h2 id="settings-title">Pengaturan</h2>
+    <div class="settings-grid">
+      <label class="field">
+        <span>KKM</span>
+        <input id="kkm" type="number" min="0" max="100" step="1" value="75" inputmode="numeric" />
+      </label>
+      <div class="field-static">
+        <span class="label">Bobot default per mapel</span>
+        <span class="hint">Tugas 20% · UTS 25% · UAS 35% · Praktik 20%</span>
+      </div>
+      <div class="field-static">
+        <span class="label">Predikat</span>
+        <span class="hint">A ≥ 86 · B ≥ 71 · C ≥ 56 · D ≥ 41 · E &lt; 41</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="table-title">
+    <div class="card-header">
+      <h2 id="table-title">Mata Pelajaran</h2>
+      <div class="actions">
+        <button id="addRow" class="btn btn-primary" type="button">+ Tambah Baris</button>
+        <button id="exportCsv" class="btn" type="button">⬇ Export CSV</button>
+        <button id="resetAll" class="btn btn-danger" type="button">↺ Reset</button>
+      </div>
+    </div>
+
+    <p id="globalWarning" class="warning" role="alert" hidden></p>
+
+    <div class="table-wrap">
+      <table id="gradeTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Mata Pelajaran</th>
+            <th>Tugas</th>
+            <th>UTS</th>
+            <th>UAS</th>
+            <th>Praktik</th>
+            <th>B.Tugas %</th>
+            <th>B.UTS %</th>
+            <th>B.UAS %</th>
+            <th>B.Praktik %</th>
+            <th>Σ Bobot</th>
+            <th>Nilai Akhir</th>
+            <th>Predikat</th>
+            <th>KKM</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="11" class="tfoot-label">Rata-rata</td>
+            <td id="avgFinal" class="tfoot-value">–</td>
+            <td id="avgPredikat" class="tfoot-value">–</td>
+            <td id="avgStatus" class="tfoot-value">–</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="hint table-hint">Nilai 0–100. Total bobot per baris harus 100%. Semua perubahan tersimpan otomatis di browser (localStorage).</p>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <div class="container">
+    <p>MIT License · <a href="https://github.com/" rel="noopener">nilai-akhir-smk</a> · Dibuat untuk siswa & guru SMK</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
