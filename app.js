@@ -13,10 +13,12 @@ const DEFAULT_ROWS = [
 const tbody = document.getElementById('tbody');
 const kkmInput = document.getElementById('kkm');
 const globalWarning = document.getElementById('globalWarning');
-const avgFinal = document.getElementById('avgFinal');
-const avgPredikat = document.getElementById('avgPredikat');
-const avgStatus = document.getElementById('avgStatus');
+const heroFinal = document.getElementById('heroFinal');
+const heroPredikat = document.getElementById('heroPredikat');
+const heroStatus = document.getElementById('heroStatus');
 const toggleThemeBtn = document.getElementById('toggleTheme');
+const toggleBobotBtn = document.getElementById('toggleBobot');
+const gradeTable = document.getElementById('gradeTable');
 
 let rows = [];
 
@@ -56,15 +58,12 @@ function hitungNilaiAkhir(r) {
   const bt = num(r.bobotTugas) ?? 0, bu = num(r.bobotUTS) ?? 0, ba = num(r.bobotUAS) ?? 0, bp = num(r.bobotPraktik) ?? 0;
   const totalBobot = bt + bu + ba + bp;
   if (totalBobot !== 100) return { nilai: null, totalBobot, valid: false };
-  const parts = [
-    [tugas, bt], [uts, bu], [uas, ba], [praktik, bp],
-  ];
+  const parts = [[tugas, bt], [uts, bu], [uas, ba], [praktik, bp]];
   let sum = 0, weightUsed = 0;
   for (const [v, w] of parts) {
     if (v !== null && w > 0) { sum += v * w; weightUsed += w; }
   }
   if (weightUsed === 0) return { nilai: null, totalBobot, valid: true };
-  // Normalisasi jika ada komponen kosong: hitung dari bobot yang terisi.
   return { nilai: sum / weightUsed, totalBobot, valid: true };
 }
 
@@ -84,21 +83,22 @@ function render() {
 
     const tr = el('tr', { 'data-index': String(i) });
 
-    tr.append(el('td', {}, String(i + 1)));
+    tr.append(el('td', { class: 'col-num', 'data-label': 'No' }, String(i + 1)));
 
-    const namaTd = el('td', { class: 'name' });
+    const namaTd = el('td', { class: 'name', 'data-label': 'Mata Pelajaran' });
     namaTd.append(el('input', {
-      type: 'text', value: r.nama, placeholder: 'Nama mata pelajaran',
+      type: 'text', value: r.nama, placeholder: 'Nama mapel…', autocomplete: 'off',
       'aria-label': 'Nama mata pelajaran baris ' + (i + 1),
       oninput: (e) => { rows[i].nama = e.target.value; persist(); },
     }));
     tr.append(namaTd);
 
-    const mkNumCell = (field, label, min, max) => {
-      const td = el('td');
+    const mkNumCell = (field, label, min, max, extraClass = '') => {
+      const td = el('td', { class: extraClass, 'data-label': label });
       const inp = el('input', {
         type: 'number', min: String(min), max: String(max), step: '0.5',
-        value: r[field], inputmode: 'decimal', 'aria-label': label + ' baris ' + (i + 1),
+        value: r[field], inputmode: 'decimal', placeholder: '–',
+        'aria-label': label + ' baris ' + (i + 1),
         oninput: (e) => { rows[i][field] = e.target.value; onRowChange(); },
       });
       const v = num(r[field]);
@@ -106,33 +106,33 @@ function render() {
       td.append(inp);
       return td;
     };
-    tr.append(mkNumCell('tugas', 'Nilai tugas', 0, 100));
-    tr.append(mkNumCell('uts', 'Nilai UTS', 0, 100));
-    tr.append(mkNumCell('uas', 'Nilai UAS', 0, 100));
-    tr.append(mkNumCell('praktik', 'Nilai praktik', 0, 100));
-    tr.append(mkNumCell('bobotTugas', 'Bobot tugas (%)', 0, 100));
-    tr.append(mkNumCell('bobotUTS', 'Bobot UTS (%)', 0, 100));
-    tr.append(mkNumCell('bobotUAS', 'Bobot UAS (%)', 0, 100));
-    tr.append(mkNumCell('bobotPraktik', 'Bobot praktik (%)', 0, 100));
+    tr.append(mkNumCell('tugas', 'Tugas', 0, 100));
+    tr.append(mkNumCell('uts', 'UTS', 0, 100));
+    tr.append(mkNumCell('uas', 'UAS', 0, 100));
+    tr.append(mkNumCell('praktik', 'Praktik', 0, 100));
+    tr.append(mkNumCell('bobotTugas', 'Bobot Tugas %', 0, 100, 'weight-col'));
+    tr.append(mkNumCell('bobotUTS', 'Bobot UTS %', 0, 100, 'weight-col'));
+    tr.append(mkNumCell('bobotUAS', 'Bobot UAS %', 0, 100, 'weight-col'));
+    tr.append(mkNumCell('bobotPraktik', 'Bobot Praktik %', 0, 100, 'weight-col'));
 
-    tr.append(el('td', { class: totalBobot === 100 ? 'sum-ok' : 'sum-bad' }, totalBobot + '%'));
-    tr.append(el('td', { class: 'final-cell' }, nilai === null ? '–' : nilai.toFixed(2)));
+    tr.append(el('td', { class: 'weight-col ' + (totalBobot === 100 ? 'sum-ok' : 'sum-bad'), 'data-label': 'Total Bobot' }, totalBobot + '%'));
+    tr.append(el('td', { class: 'cell-final', 'data-label': 'Nilai Akhir' },
+      el('span', { class: 'final-cell' }, nilai === null ? '–' : nilai.toFixed(2))));
 
-    const predTd = el('td');
+    const predTd = el('td', { 'data-label': 'Predikat' });
     predTd.append(nilai === null
       ? document.createTextNode('–')
       : el('span', { class: 'badge badge-' + pred }, pred));
     tr.append(predTd);
 
-    const statusTd = el('td', { class: nilai === null ? '' : (lulus ? 'status-pass' : 'status-fail') },
-      nilai === null ? '–' : (lulus ? 'Lulus' : 'Remedial'));
-    tr.append(statusTd);
+    tr.append(el('td', { class: nilai === null ? '' : (lulus ? 'status-pass' : 'status-fail'), 'data-label': 'Status' },
+      nilai === null ? '–' : (lulus ? 'Lulus' : 'Remedial')));
 
-    const delTd = el('td');
+    const delTd = el('td', { class: 'cell-delete' });
     delTd.append(el('button', {
-      type: 'button', class: 'row-delete', title: 'Hapus baris', 'aria-label': 'Hapus baris ' + (i + 1),
+      type: 'button', class: 'row-delete', title: 'Hapus mapel', 'aria-label': 'Hapus baris ' + (i + 1),
       onclick: () => { rows.splice(i, 1); persist(); render(); },
-    }, '✕'));
+    }, '🗑️'));
     tr.append(delTd);
 
     tbody.append(tr);
@@ -140,16 +140,16 @@ function render() {
 
   if (anyInvalid) {
     globalWarning.hidden = false;
-    globalWarning.textContent = 'Ada baris dengan total bobot ≠ 100%. Nilai akhir baris tersebut tidak dihitung.';
+    globalWarning.textContent = '⚠️ Ada mapel dengan total bobot bukan 100%. Nilai akhir mapel itu belum dihitung.';
   } else {
     globalWarning.hidden = true;
   }
 
   const avg = countFinal ? sumFinal / countFinal : null;
-  avgFinal.textContent = avg === null ? '–' : avg.toFixed(2);
-  avgPredikat.textContent = predikat(avg);
-  avgStatus.textContent = avg === null ? '–' : (avg >= kkm ? 'Lulus' : 'Remedial');
-  avgStatus.className = 'tfoot-value ' + (avg === null ? '' : (avg >= kkm ? 'status-pass' : 'status-fail'));
+  heroFinal.textContent = avg === null ? '–' : avg.toFixed(2);
+  heroPredikat.textContent = predikat(avg);
+  heroStatus.textContent = avg === null ? '–' : (avg >= kkm ? 'Lulus' : 'Remedial');
+  heroStatus.className = 'hero-chip-value ' + (avg === null ? '' : (avg >= kkm ? 'ok' : 'bad'));
 }
 
 let rafPending = false;
@@ -184,11 +184,11 @@ document.getElementById('addRow').addEventListener('click', () => {
   rows.push({ nama: '', tugas: '', uts: '', uas: '', praktik: '', ...DEFAULT_BOBOT });
   persist(); render();
   const last = tbody.querySelector('tr:last-child .name input');
-  if (last) last.focus();
+  if (last) last.focus({ preventScroll: false });
 });
 
 document.getElementById('resetAll').addEventListener('click', () => {
-  if (!confirm('Hapus semua data dan kembalikan ke contoh awal?')) return;
+  if (!confirm('Hapus semua isi dan mulai dari contoh awal?')) return;
   localStorage.removeItem(STORAGE_KEY);
   kkmInput.value = '75';
   rows = structuredClone(DEFAULT_ROWS);
@@ -218,6 +218,12 @@ document.getElementById('exportCsv').addEventListener('click', () => {
 });
 
 kkmInput.addEventListener('input', onRowChange);
+
+toggleBobotBtn.addEventListener('click', () => {
+  const hidden = gradeTable.classList.toggle('hide-weights');
+  toggleBobotBtn.setAttribute('aria-expanded', String(!hidden));
+  toggleBobotBtn.textContent = hidden ? '⚖️ Atur bobot' : '⚖️ Sembunyikan bobot';
+});
 
 toggleThemeBtn.addEventListener('click', () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';

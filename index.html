@@ -2,8 +2,9 @@
 <html lang="id" data-theme="light">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Kalkulator nilai akhir SMK: hitung nilai rata-rata berbobot per mata pelajaran, predikat huruf, KKM, dan export CSV. Tanpa dependency." />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#2563eb" />
+<meta name="description" content="Kalkulator nilai akhir SMK: isi nilai, langsung keluar nilai akhir, predikat, dan status KKM. Tanpa daftar, tanpa ribet." />
 <title>Kalkulator Nilai Akhir SMK</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
 <link rel="stylesheet" href="style.css" />
@@ -11,85 +12,82 @@
 <body>
 <header class="app-header">
   <div class="container header-inner">
-    <div>
-      <h1>Kalkulator Nilai Akhir SMK</h1>
-      <p class="subtitle">Hitung nilai akhir berbobot, predikat, dan status KKM per mata pelajaran.</p>
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🎓</span>
+      <div>
+        <h1>Kalkulator Nilai SMK</h1>
+        <p class="subtitle">Isi nilainya, hasil langsung keluar.</p>
+      </div>
     </div>
-    <button id="toggleTheme" class="btn btn-ghost" type="button" aria-label="Ganti mode gelap/terang">🌙</button>
+    <button id="toggleTheme" class="icon-btn" type="button" aria-label="Ganti mode gelap/terang">🌙</button>
   </div>
 </header>
 
 <main class="container">
-  <section class="card settings" aria-labelledby="settings-title">
-    <h2 id="settings-title">Pengaturan</h2>
-    <div class="settings-grid">
-      <label class="field">
-        <span>KKM</span>
-        <input id="kkm" type="number" min="0" max="100" step="1" value="75" inputmode="numeric" />
-      </label>
-      <div class="field-static">
-        <span class="label">Bobot default per mapel</span>
-        <span class="hint">Tugas 20% · UTS 25% · UAS 35% · Praktik 20%</span>
-      </div>
-      <div class="field-static">
-        <span class="label">Predikat</span>
-        <span class="hint">A ≥ 86 · B ≥ 71 · C ≥ 56 · D ≥ 41 · E &lt; 41</span>
-      </div>
+
+  <!-- Ringkasan besar: yang paling dicari user -->
+  <section class="hero card" aria-label="Ringkasan nilai">
+    <div class="hero-main">
+      <span class="hero-label">Rata-rata Nilai Akhir</span>
+      <span id="heroFinal" class="hero-value">–</span>
     </div>
+    <div class="hero-side">
+      <div class="hero-chip"><span class="hero-chip-label">Predikat</span><span id="heroPredikat" class="hero-chip-value">–</span></div>
+      <div class="hero-chip"><span class="hero-chip-label">Status</span><span id="heroStatus" class="hero-chip-value">–</span></div>
+    </div>
+    <label class="kkm-inline" for="kkm">
+      <span>KKM</span>
+      <input id="kkm" type="number" min="0" max="100" step="1" value="75" inputmode="numeric" />
+    </label>
   </section>
 
-  <section class="card" aria-labelledby="table-title">
-    <div class="card-header">
+  <p id="globalWarning" class="warning" role="alert" hidden></p>
+
+  <!-- Daftar mata pelajaran -->
+  <section class="card list-card" aria-labelledby="table-title">
+    <div class="list-head">
       <h2 id="table-title">Mata Pelajaran</h2>
-      <div class="actions">
-        <button id="addRow" class="btn btn-primary" type="button">+ Tambah Baris</button>
-        <button id="exportCsv" class="btn" type="button">⬇ Export CSV</button>
-        <button id="resetAll" class="btn btn-danger" type="button">↺ Reset</button>
-      </div>
+      <button id="toggleBobot" class="btn btn-ghost small" type="button" aria-expanded="false" aria-controls="gradeTable">⚖️ Atur bobot</button>
     </div>
 
-    <p id="globalWarning" class="warning" role="alert" hidden></p>
-
     <div class="table-wrap">
-      <table id="gradeTable">
+      <table id="gradeTable" class="hide-weights">
         <thead>
           <tr>
-            <th>#</th>
+            <th class="col-num">#</th>
             <th>Mata Pelajaran</th>
             <th>Tugas</th>
             <th>UTS</th>
             <th>UAS</th>
             <th>Praktik</th>
-            <th>B.Tugas %</th>
-            <th>B.UTS %</th>
-            <th>B.UAS %</th>
-            <th>B.Praktik %</th>
-            <th>Σ Bobot</th>
-            <th>Nilai Akhir</th>
+            <th class="weight-col">B.Tugas %</th>
+            <th class="weight-col">B.UTS %</th>
+            <th class="weight-col">B.UAS %</th>
+            <th class="weight-col">B.Praktik %</th>
+            <th class="weight-col">Σ Bobot</th>
+            <th>Akhir</th>
             <th>Predikat</th>
-            <th>KKM</th>
-            <th></th>
+            <th>Status</th>
+            <th><span class="sr-only">Hapus</span></th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="11" class="tfoot-label">Rata-rata</td>
-            <td id="avgFinal" class="tfoot-value">–</td>
-            <td id="avgPredikat" class="tfoot-value">–</td>
-            <td id="avgStatus" class="tfoot-value">–</td>
-            <td></td>
-          </tr>
-        </tfoot>
       </table>
     </div>
-    <p class="hint table-hint">Nilai 0–100. Total bobot per baris harus 100%. Semua perubahan tersimpan otomatis di browser (localStorage).</p>
+    <p class="hint list-hint">Nilai 0–100. Bobot default: Tugas 20 · UTS 25 · UAS 35 · Praktik 20 (total harus 100%). Tersimpan otomatis di HP/browser ini.</p>
   </section>
 </main>
 
+<!-- Action bar: selalu terjangkau, nempel di bawah layar di HP -->
+<div class="action-bar" role="toolbar" aria-label="Aksi">
+  <button id="addRow" class="btn btn-primary big" type="button">＋ Tambah Mapel</button>
+  <button id="exportCsv" class="btn big" type="button">⬇ CSV</button>
+  <button id="resetAll" class="btn btn-danger big" type="button">↺ Reset</button>
+</div>
+
 <footer class="app-footer">
   <div class="container">
-    <p>MIT License · <a href="https://github.com/" rel="noopener">nilai-akhir-smk</a> · Dibuat untuk siswa & guru SMK</p>
+    <p>MIT License · nilai-akhir-smk · Dibuat untuk siswa &amp; guru SMK</p>
   </div>
 </footer>
 
