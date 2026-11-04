@@ -13,7 +13,7 @@ Single-page web app untuk menghitung nilai akhir mata pelajaran SMK secara berbo
 - **Export CSV** via Blob (delimiter `;`, UTF-8 BOM agar rapi di Excel).
 - **Persist** otomatis ke `localStorage` (data tidak hilang saat reload).
 - **Reset** ke contoh awal.
-- UI Bahasa Indonesia, **mobile-first** (tabel scroll horizontal di layar kecil), **dark mode** toggle 🌙/☀️.
+- UI Bahasa Indonesia, **mobile-first**: di layar <860px tabel berubah jadi kartu per mapel, aksi utama (Tambah/CSV/Reset) nempel di action bar bawah, target sentuh >=48px, input 16px (anti zoom iOS). Bobot disembunyikan by default (tombol "Atur bobot"). Ringkasan besar: rata-rata + predikat + status di hero atas. **Dark mode** toggle.
 
 ## Pakai
 
